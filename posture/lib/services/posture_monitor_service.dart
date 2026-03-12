@@ -9,6 +9,8 @@ class PostureMonitorService {
 
   late DatabaseReference _historyRef;
 
+  StreamSubscription<DatabaseEvent>? _subscription;
+
   String? _lastRecord;
   int _badCount = 0;
 
@@ -24,13 +26,16 @@ class PostureMonitorService {
   /// start monitor
   void startMonitoring(String deviceName) {
 
-    /// reset ค่าเมื่อเริ่ม monitor
+    /// ❗ stop listener เก่าก่อน
+    _subscription?.cancel();
+
+    /// reset ค่า
     _badCount = 0;
     _lastRecord = null;
 
     _historyRef = FirebaseDatabase.instance.ref("$deviceName/history");
 
-    _historyRef.onValue.listen((event) async {
+    _subscription = _historyRef.onValue.listen((event) async {
 
       final data = event.snapshot.value;
 
@@ -48,7 +53,7 @@ class PostureMonitorService {
       final times = dayData.keys.toList()..sort();
       final latestTime = times.last;
 
-      /// ป้องกัน record ซ้ำ
+      /// กัน record ซ้ำ
       String currentRecord = "$latestDate-$latestTime";
 
       if (currentRecord == _lastRecord) return;
@@ -75,11 +80,15 @@ class PostureMonitorService {
           detail ?? "โปรดปรับท่านั่ง",
         );
 
-        /// reset เพื่อให้แจ้งรอบต่อไป
         _badCount = 0;
       }
 
     });
+  }
+
+  /// stop monitor (ตอนเปลี่ยนบอร์ด)
+  void stopMonitoring() {
+    _subscription?.cancel();
   }
 
   /// show notification
@@ -88,8 +97,6 @@ class PostureMonitorService {
     final prefs = await SharedPreferences.getInstance();
     bool enabled = prefs.getBool("notificationEnabled") ?? true;
 
-
-    /// ถ้าปิด notification → ไม่แจ้งเตือน
     if (!enabled) return;
 
     const androidDetails = AndroidNotificationDetails(
