@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'history_page.dart';
 
+/// หน้าสำหรับแสดงข้อมูลสรุปท่านั่งของผู้ใช้ โดยจะเชื่อมต่อกับ Realtime Database เพื่อรับข้อมูลท่านั่งล่าสุดและประวัติท่านั่งในอดีต และแสดงผลในรูปแบบ Dashboard ที่มีการจัดกลุ่มข้อมูลตามวันที่และแสดงรายละเอียดของท่านั่งแต่ละช่วงเวลา
 class DashboardPage extends StatefulWidget {
   final String deviceName;
 
@@ -12,9 +13,11 @@ class DashboardPage extends StatefulWidget {
   });
 
   @override
+  /// ฟังชั่น createState จะถูกเรียกเมื่อหน้า DashboardPage ถูกสร้างขึ้นครั้งแรก โดยจะสร้าง instance ของ _DashboardPageState ซึ่งเป็น State ของ DashboardPage ที่จะจัดการกับข้อมูลและ UI ของหน้า Dashboard
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
+/// State ของ DashboardPage จะมีการเชื่อมต่อกับ Realtime Database เพื่อรับข้อมูลท่านั่งล่าสุดและประวัติท่านั่งในอดีต และจัดการกับการแสดงผลในรูปแบบ Dashboard โดยมีการจัดกลุ่มข้อมูลตามวันที่และแสดงรายละเอียดของท่านั่งแต่ละช่วงเวลา
 class _DashboardPageState extends State<DashboardPage> {
 
   /// Firebase reference
@@ -30,6 +33,7 @@ class _DashboardPageState extends State<DashboardPage> {
   String currentPostureDetail = "";
 
   @override
+  /// ฟังชั่น initState จะถูกเรียกเมื่อหน้า DashboardPage ถูกสร้างขึ้นครั้งแรก โดยจะทำการเชื่อมต่อกับ Realtime Database ที่ path "deviceName/history" และเริ่มฟังข้อมูลท่านั่งที่ถูกอัพเดตใน Realtime Database เพื่ออัพเดตข้อมูลในหน้า Dashboard ให้เป็นปัจจุบันอยู่เสมอ
   void initState() {
     super.initState();
 

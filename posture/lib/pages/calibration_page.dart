@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+/// หน้าสำหรับตั้งค่าท่านั่งที่ถูกต้อง (Calibration) โดยจะเชื่อมต่อกับ Realtime Database เพื่อรับค่ามุมที่ถูกต้องจากอุปกรณ์ และส่งคำขอ Calibration ไปยังอุปกรณ์เมื่อผู้ใช้กดปุ่มเริ่ม Calibration
 class CalibrationPage extends StatefulWidget {
   final String deviceName;
 
@@ -19,6 +20,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
   double roll0 = 0;
 
   @override
+  /// ฟังชั่น initState จะถูกเรียกเมื่อหน้า CalibrationPage ถูกสร้างขึ้นครั้งแรก
   void initState() {
     super.initState();
 
@@ -27,19 +29,20 @@ class _CalibrationPageState extends State<CalibrationPage> {
     listenCalibration();
   }
 
+  /// ฟังชั่นนี้จะฟังค่าที่ถูกอัพเดตใน Realtime Database ที่ path "deviceName/calibration" และอัพเดตค่า pitch0 กับ roll0 ในหน้า CalibrationPage
   void listenCalibration() {
     ref.onValue.listen((event) {
       final data = event.snapshot.value;
 
       if (data == null || data is! Map) return;
-
+      /// เมื่อมีการอัพเดตค่าที่ path "deviceName/calibration" จะทำการดึงค่าของ "pitch0" และ "roll0" มาแปลงเป็น double และอัพเดต state ของหน้า CalibrationPage เพื่อแสดงค่าท่านั่งที่ถูกต้องให้ผู้ใช้เห็น
       setState(() {
         pitch0 = (data["pitch0"] ?? 0).toDouble();
         roll0 = (data["roll0"] ?? 0).toDouble();
       });
     });
   }
-
+  /// ฟังชั่นนี้จะส่งคำขอ Calibration ไปยัง Realtime Database โดยการตั้งค่า "deviceName/calibration/request" เป็น true ซึ่งจะทำให้ Node.js ที่เชื่อมต่อกับ Firebase สามารถรับรู้ได้ว่าผู้ใช้ต้องการเริ่มกระบวนการ Calibration และสามารถส่งคำสั่งไปยังอุปกรณ์เพื่อให้มันส่งค่ามุมกลับมาเก็บใน "deviceName/calibration/pitch0" และ "deviceName/calibration/roll0"
   Future<void> sendCalibrationRequest() async {
     setState(() => isLoading = true);
 
@@ -48,7 +51,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
     if (!mounted) return;
 
     setState(() => isLoading = false);
-
+    /// แสดง SnackBar เพื่อแจ้งผู้ใช้ว่าคำขอ Calibration ถูกส่งไปยังอุปกรณ์แล้ว
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("ส่งคำขอ Calibration ไปยัง ${widget.deviceName} แล้ว"),
@@ -58,7 +61,8 @@ class _CalibrationPageState extends State<CalibrationPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  /// ฟังชั่น build จะสร้าง UI ของหน้า CalibrationPage ซึ่งประกอบด้วย AppBar ที่แสดงชื่ออุปกรณ์, ไอคอนที่สื่อถึงการตั้งค่าท่านั่ง, ข้อความแนะนำการตั้งค่าท่านั่ง, กล่องที่แสดงค่าท่านั่งที่ถูกต้อง (pitch0 และ roll0), และปุ่มสำหรับเริ่มกระบวนการ Calibration
+  Widget build(BuildContext context) { 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7F6),
       appBar: AppBar(
@@ -70,7 +74,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
           style: const TextStyle(color: Colors.black),
         ),
       ),
-      body: Padding(
+      body: Padding( /// เพิ่ม padding รอบๆ เนื้อหาทั้งหมดในหน้า CalibrationPage เพื่อให้ดูสบายตาและไม่ชิดขอบหน้าจอมากเกินไป
         padding: const EdgeInsets.all(24),
         child: Center(
           child: SizedBox(
@@ -88,7 +92,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
                   )
                 ],
               ),
-              child: Column(
+              child: Column( /// จัดเรียงเนื้อหาในหน้า CalibrationPage เป็นแนวตั้ง โดยมีไอคอน, ข้อความแนะนำ, กล่องแสดงค่าท่านั่งที่ถูกต้อง, และปุ่มเริ่ม Calibration เรียงต่อกันไปตามลำดับ
                 children: [
                   /// ICON
                   Container(
@@ -194,7 +198,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
                   const Spacer(),
 
                   /// BUTTON
-                  SizedBox(
+                  SizedBox( 
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
@@ -206,7 +210,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
                         ),
                         elevation: 4,
                       ),
-                      child: isLoading
+                      child: isLoading /// ถ้า isLoading เป็น true จะแสดง CircularProgressIndicator ในปุ่มเพื่อบอกผู้ใช้ว่ากำลังส่งคำขอ Calibration อยู่ แต่ถ้า isLoading เป็น false จะแสดงข้อความ "เริ่ม Calibration" ในปุ่ม
                           ? const SizedBox(
                               width: 22,
                               height: 22,

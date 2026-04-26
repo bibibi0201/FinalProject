@@ -8,6 +8,7 @@ import 'services/posture_monitor_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 /// background FCM handler
+/// nction นี้จะถูกเรียกเมื่อแอปอยู่ใน background หรือถูกปิดอยู่ และมีการรับ notification เข้ามา
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: FirebaseConfig.webOptions,
@@ -17,9 +18,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized(); /// ทำให้สามารถใช้ async ใน main ได้
 
-  await Firebase.initializeApp(
+  /// initialize Firebase
+  await Firebase.initializeApp( 
     options: FirebaseConfig.webOptions,
   );
 
@@ -53,7 +55,7 @@ void main() async {
 class MyApp extends StatefulWidget {
   final String? savedDevice;
 
-  const MyApp({super.key, this.savedDevice});
+  const MyApp({super.key, this.savedDevice}); /// รับ deviceName ที่เคยบันทึกไว้จาก SharedPreferences
 
   @override
   State<MyApp> createState() => _MyAppState();

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+
+/// หน้าสำหรับแสดงข้อมูลสรุปท่านั่งของผู้ใช้ โดยจะเชื่อมต่อกับ Realtime Database เพื่อรับข้อมูลท่านั่งล่าสุดและประวัติท่านั่งในอดีต และแสดงผลในรูปแบบ Dashboard ที่มีการจัดกลุ่มข้อมูลตามวันที่และแสดงรายละเอียดของท่านั่งแต่ละช่วงเวลา
 class HistoryPage extends StatefulWidget {
   final String deviceName;
 
@@ -18,6 +20,7 @@ class HistoryPage extends StatefulWidget {
   State<HistoryPage> createState() => _HistoryPageState();
 }
 
+/// State ของ HistoryPage จะมีการเชื่อมต่อกับ Realtime Database เพื่อรับข้อมูลท่านั่งล่าสุดและประวัติท่านั่งในอดีต และจัดการกับการแสดงผลในรูปแบบ Dashboard โดยมีการจัดกลุ่มข้อมูลตามวันที่และแสดงรายละเอียดของท่านั่งแต่ละช่วงเวลา
 class _HistoryPageState extends State<HistoryPage> {
 
   /// Firebase reference
@@ -151,6 +154,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   @override
+  /// ฟังชั่น initState จะถูกเรียกเมื่อหน้า HistoryPage ถูกสร้างขึ้นครั้งแรก โดยจะทำการเชื่อมต่อกับ Realtime Database ที่ path "deviceName/history" และเริ่มฟังข้อมูลท่านั่งที่ถูกอัพเดตใน Realtime Database เพื่ออัพเดตข้อมูลในหน้า HistoryPage ให้เป็นปัจจุบันอยู่เสมอ
   Widget build(BuildContext context) {
 
     if (sortedDates.isEmpty || selectedDate == null) {
@@ -163,7 +167,7 @@ class _HistoryPageState extends State<HistoryPage> {
     }
 
     final data = dailyData[selectedDate]!;
-
+    /// ดึงข้อมูลสรุปของวันที่เลือกมาแสดงในหน้า HistoryPage โดยจะมีการคำนวณอัตราท่านั่งถูกต้องและแสดงผลในรูปแบบกราฟวงกลม (Pie Chart) และสรุปข้อมูลต่างๆ เช่น จำนวนท่านั่งถูกต้อง, ท่านั่งผิด, และท่านั่งไม่ทราบ รวมถึงการแสดงรายละเอียดของปัญหาที่พบบ่อยในท่านั่งผิด
     double correct = data["correct"].toDouble();
     double incorrect = data["incorrect"].toDouble();
     double unknown = data["unknown"].toDouble();
@@ -344,7 +348,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
 
                   const SizedBox(height: 15),
-
+                  /// สรุปจำนวนท่านั่งถูกต้อง, ผิด, ไม่ทราบ
                   if (!noValidData)
                     Row(
 
